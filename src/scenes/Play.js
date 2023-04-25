@@ -8,13 +8,16 @@ class Play extends Phaser.Scene {
         this.load.image('rocket', './assets/rocket.png');
         this.load.image('spaceship', './assets/spaceship.png');
         this.load.image('starfield', './assets/starfield.png');
+        this.load.image('astral field', './assets/Astral Field.png');
         this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 64,
         frameHeight: 32, startFrame: 0, endFrame: 9});
     }
     
     create() {
         // place tile sprite
-        this.starfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0, 0);
+        this.starfield = this.add.tileSprite(0, 0, 640, 480, 'astral field').setOrigin(0, 0);
+        // add music during play
+        this.sound.play('music_background');
         // green UI background
         this.add.rectangle(0, borderUISize + borderPadding, game.config.width, borderUISize * 2, 0x00FF00).setOrigin(0, 0);
         // white borders
@@ -41,6 +44,7 @@ class Play extends Phaser.Scene {
         });
         // initialize score
         this.p1Score = 0;
+    
         // display score
         let scoreConfig = {
             fontFamily: 'Courier',
@@ -54,7 +58,24 @@ class Play extends Phaser.Scene {
             },
             fixedWidth: 100
         }
+
+        // dispaly fire
+        let fireConfig = {
+            fontFamily: 'Courier',
+            fontSize: '28px',
+            backgroundColor: '#FFFFFF',
+            color: '#843605',
+            align: 'center',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 100
+        }
+
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig);
+        // Included FIRE text in UI
+        this.fireText = this.add.text(borderUISize + borderPadding*15, borderUISize + borderPadding*2, 'FIRE', fireConfig);
         // GAME OVER flag
         this.gameOver = false;
 
@@ -62,10 +83,24 @@ class Play extends Phaser.Scene {
         scoreConfig.fixedWidth = 0;
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
-            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or <- for Menu', scoreConfig).setOrigin(0.5);       
+            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or <- for Menu', scoreConfig).setOrigin(0.5);
+            this.game.sound.stopAll();
             this.gameOver = true;        
         }, null, this);
-    }
+
+        // 30-second ship speed up
+        this.speedUp = this.time.delayedCall(game.settings.gameTimer/2, () => {
+            this.ship01.moveSpeed += 2;
+            this.ship02.moveSpeed += 2;
+            this.ship03.moveSpeed += 2;
+            this.p1Rocket.moveSpeed += 2;
+        }, null, this);
+
+        // stop music
+        if (this.gameOver) {
+            this.sound.stop('music_background');
+        }
+    }   
 
     update() {
         // check key input for restart
