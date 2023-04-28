@@ -189,7 +189,17 @@ class Play extends Phaser.Scene {
         });
         // score add and repaint
         this.p1Score += ship.points;
+        this.timeInSeconds += 5;
         this.scoreLeft.text = this.p1Score;
-        this.sound.play('sfx_explosion');
+        var random_num = Phaser.Math.Between(1, 5);
+        if (random_num == 1) {
+            this.sound.play('new_explosion1');
+        } else if (random_num == 2) {
+            this.sound.play('new_explosion2');
+        } else if (random_num == 3) {
+            this.sound.play('new_explosion3');
+        } else {
+            this.sound.play('new_explosion4');
+        }
     }
 }
