@@ -117,6 +117,7 @@ class Play extends Phaser.Scene {
             callbackScope: this,
             loop: true
         });
+    
 
         // 30-second ship speed up
         this.speedUp = this.time.delayedCall(30000, () => {
@@ -189,7 +190,6 @@ class Play extends Phaser.Scene {
         });
         // score add and repaint
         this.p1Score += ship.points;
-        this.timeInSeconds += 5;
         this.scoreLeft.text = this.p1Score;
         var random_num = Phaser.Math.Between(1, 5);
         if (random_num == 1) {
