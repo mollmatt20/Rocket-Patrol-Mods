@@ -20,7 +20,7 @@ class Menu extends Phaser.Scene {
         let menuConfig = {
             fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif',
             fontSize: '25px',
-            color: '#000',
+            color: '#FFFFFF',
             align: 'right',
             fixedWidth: 0
         }
@@ -43,7 +43,7 @@ class Menu extends Phaser.Scene {
             // easy mode
             game.settings = {
                 spaceshipSpeed: 3,
-                gameTimer: 10000    // Originally 60000
+                gameTimer: 60000  
             }
             this.sound.play('sfx_select');
             this.scene.start('playScene');
@@ -52,7 +52,7 @@ class Menu extends Phaser.Scene {
             // hard mode
             game.settings = {
                 spaceshipSpeed: 4,
-                gameTimer: 1000    // Originally 45000
+                gameTimer: 45000 
             }
             this.sound.play('sfx_select');
             this.scene.start('playScene');

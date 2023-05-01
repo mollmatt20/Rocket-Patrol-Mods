@@ -8,8 +8,8 @@ class Play extends Phaser.Scene {
         this.load.image('rocket', './assets/rocket.png');
         this.load.image('spaceship', './assets/spaceship.png');
         this.load.image('ufo', './assets/UFO.png');
-        this.load.image('starfield', './assets/starfield.png');
         this.load.image('astral field', './assets/Astral Field.png');
+        this.load.image('fire', './assets/fire_particles.png');
         this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth: 64,
         frameHeight: 32, startFrame: 0, endFrame: 9});
     }
@@ -31,23 +31,19 @@ class Play extends Phaser.Scene {
         // add rocket (p1)
         this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket').setOrigin(0.5, 0);
         // add spaceships (x4)
-        this.ship00 = new Spaceship(this, game.config.width + borderUISize*3, borderUISize*6, 'ufo', 0, 60).setOrigin(0, 0);
-        // left is true; right is false
-        if (Math.random() < 0.5) {
-            this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*4, 'spaceship', 0, 30).setOrigin(0, 0);
-        } else {
-            this.ship01 = new Spaceship(this, -(game.config.width + borderUISize*6), borderUISize*4, 'spaceship', 0, 30).setOrigin(0, 0);
+        let startPosition = (Math.random() < 0.5) ? 1 : -1;
+        this.ship00 = new Spaceship(this, startPosition * (game.config.width + borderUISize*3), borderUISize*6, 'ufo', 0, 60, startPosition).setOrigin(0, 0);
+        this.ship01 = new Spaceship(this, startPosition * (game.config.width + borderUISize*6), borderUISize*4, 'spaceship', 0, 30, startPosition).setOrigin(0, 0);
+        this.ship02 = new Spaceship(this, startPosition * (game.config.width + borderUISize*3), borderUISize*5 + borderPadding*2, 'spaceship', 0, 20, startPosition).setOrigin(0, 0);
+        this.ship03 = new Spaceship(this, startPosition * (game.config.width), borderUISize*6 + borderPadding*4, 'spaceship', 0, 10, startPosition).setOrigin(0, 0);
+        if (this.ship01.direction < 0) {
+            this.ship01.setFlip(true, false)
         }
-        if (Math.random() < 0.5) {
-            this.ship02 = new Spaceship(this, game.config.width + borderUISize*3, borderUISize*5 + borderPadding*2, 'spaceship', 0, 20).setOrigin(0, 0);
-        } else {
-            this.ship02 = new Spaceship(this, -(game.config.width + borderUISize*3), borderUISize*5 + borderPadding*2, 'spaceship', 0, 20).setOrigin(0, 0);
-
+        if (this.ship02.direction < 0) {
+            this.ship02.setFlip(true, false)
         }
-        if (Math.random() < 0.5) {
-            this.ship03 = new Spaceship(this, game.config.width, borderUISize*6 + borderPadding*4, 'spaceship', 0, 10).setOrigin(0, 0);
-        } else {
-            this.ship03 = new Spaceship(this, -(game.config.width), borderUISize*6 + borderPadding*4, 'spaceship', 0, 10).setOrigin(0, 0);
+        if (this.ship03.direction < 0) {
+            this.ship03.setFlip(true, false)
         }
         // set ufo move speed as fastest one
         this.ship00.moveSpeed += 2;
@@ -64,7 +60,6 @@ class Play extends Phaser.Scene {
         });
         // initialize score
         this.p1Score = 0;
-        this.countDown = game.settings.gameTimer;
         // display score
         let scoreConfig = {
             fontFamily: 'Courier',
@@ -106,6 +101,8 @@ class Play extends Phaser.Scene {
                 highScore = this.p1Score;
             }        
         }, null, this);
+
+        // Time left displayed during play
         this.timer = this.time.addEvent({
             delay: 1000,
             callback: () => {
@@ -137,7 +134,11 @@ class Play extends Phaser.Scene {
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
             this.scene.start("menuScene");
         }
-        this.starfield.tilePositionX -= 4;
+        if (this.ship01.direction > 0) {
+            this.starfield.tilePositionX -= 4;
+        } else {
+            this.starfield.tilePositionX += 4;
+        }
         if(!this.gameOver) {
             this.p1Rocket.update();
             this.ship00.update();
@@ -180,8 +181,18 @@ class Play extends Phaser.Scene {
     shipExplode(ship) {
         // temporarily hide ship
         ship.alpha = 0;
+        // create particle at ship's position
+        var particles = this.add.particles(ship.x, ship.y, 'fire', {
+            duration: 100,
+            frequency: 5,
+            maxVelocityX: 50, 
+            maxVelocityY: 50, 
+            radial: true,
+            speed: {random: [-100, 200]}
+        });
         // create explosion sprite at ship's position
         let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0, 0);
+        particles.start();
         boom.anims.play('explode');             // play explode animation
         boom.on('animationcomplete', () => {    // callback after anim completes
             ship.reset();                       // reset ship position
