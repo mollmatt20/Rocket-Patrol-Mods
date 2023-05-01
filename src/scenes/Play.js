@@ -82,7 +82,7 @@ class Play extends Phaser.Scene {
         this.fireText = this.add.text(borderUISize + borderPadding*8, borderUISize + borderPadding*2, 'FIRE', scoreConfig);
         // Included high score in UI
         scoreConfig.align = 'left';
-        scoreConfig.fixedWidth = 210;
+        scoreConfig.fixedWidth = 230;
         this.highScoreText = this.add.text(borderUISize + borderPadding*19, borderUISize + borderPadding*2, `High Score: ${highScore}`, scoreConfig);
         // GAME OVER flag
         this.gameOver = false;
@@ -90,7 +90,7 @@ class Play extends Phaser.Scene {
         // 60-second play clock
         scoreConfig.fixedWidth = 120;
         this.timeInSeconds = Math.round(game.settings.gameTimer / 1000);
-        this.timerText = this.add.text(borderUISize + borderPadding*40, borderUISize + borderPadding*2, `Time: ${this.timeInSeconds}`, scoreConfig)
+        this.timerText = this.add.text(borderUISize + borderPadding*42, borderUISize + borderPadding*2, `Time: ${this.timeInSeconds}`, scoreConfig)
         scoreConfig.fixedWidth = 0;
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
